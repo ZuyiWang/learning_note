@@ -1,14 +1,30 @@
 # PyTorch学习笔记 
-## 英文官方文档
-### Chapter 1 Learning PyTorch
+# 1. [英文官方文档](https://pytorch.org/tutorials/)
+## Chapter 1 Learning PyTorch
 ---
-#### Deep Learning with PyTorch: A 60 Minute Blitz
+### Deep Learning with PyTorch: A 60 Minute Blitz
 ---
-##### What's PyTorch?
++ What's PyTorch?
+   + 它是一个基于python的科学计算包，可以实现两个目的:代替NumPy从而可以使用gpu的力量; 可以帮助实现神经网络的自动微分库;
+
+
+
+### Learning Pytorch with Examples
 ---
-   1. What's PyTorch?
-      
-      + 它是一个基于python的科学计算包，可以实现两个目的:代替NumPy从而可以使用gpu的力量; 可以帮助实现神经网络的自动微分库;
+
+
+### What is *torch.nn* really?
+---
+ 
+
+### Visualizing Models, Data, and Training with TensorBoard
+---
+
+## Chapter 2 Image/Video
+---
+
+
+   
    2. 张量 Tensor
       + 创建未初始化的矩阵, 在没有初始化之前，其初始值为内存中的值
       ```python
