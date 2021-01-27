@@ -7,17 +7,17 @@
 + What's PyTorch?
    + 它是一个基于python的科学计算包，可以实现两个目的:代替NumPy从而可以使用gpu的力量; 可以帮助实现神经网络的自动微分库;
 #### Tensors
-   1. 张量的初始化
-   ```python
-   import torch
-   import numpy
-   ```
+---
+   1. **张量的初始化**
+      ```python
+      import torch
+      import numpy
+      ```
    + 从数据转化
-   ```python
-   data = [[1, 2],[3, 4]]
-   x_data = torch.tensor(data)
- 
-   ```
+      ```python
+      data = [[1, 2],[3, 4]]
+      x_data = torch.tensor(data) 
+      ```
    + 由Numpy Array创建张量
       ```python
       np_array = np.array(data)
@@ -44,16 +44,16 @@
       #         [-0.8535, -0.3139, -0.4333]])
       ```
    + 创建未初始化的矩阵, 在没有初始化之前，其初始值为内存中的值
-   ```python
-      x = torch.empty(5, 3)
-      print(x)
-      
-      # tensor([[ 7.1441e+31,  6.9987e+22,  7.8675e+34],
-      #         [ 4.7418e+30,  5.9663e-02,  7.0374e+22],
-      #         [ 1.6195e-37,  0.0000e+00,  1.6195e-37],
-      #         [ 0.0000e+00,  1.8077e-43,  0.0000e+00],
-      #         [-5.3705e-17,  4.5717e-41, -5.3705e-17]])
-   ```
+      ```python
+         x = torch.empty(5, 3)
+         print(x)
+         
+         # tensor([[ 7.1441e+31,  6.9987e+22,  7.8675e+34],
+         #         [ 4.7418e+30,  5.9663e-02,  7.0374e+22],
+         #         [ 1.6195e-37,  0.0000e+00,  1.6195e-37],
+         #         [ 0.0000e+00,  1.8077e-43,  0.0000e+00],
+         #         [-5.3705e-17,  4.5717e-41, -5.3705e-17]])
+      ```
    + 创建随机初始化的矩阵
       ```python
       x = torch.rand(5, 3)
@@ -83,37 +83,108 @@
       
       # tensor([5.5000, 3.0000])
       ```
-      
-      
+   2. **张量的属性**
+   + 张量的shape dtype device
+      ```python
+      tensor = torch.rand(3,4)
 
+      print(f"Shape of tensor: {tensor.shape}")
+      print(f"Datatype of tensor: {tensor.dtype}")
+      print(f"Device tensor is stored on: {tensor.device}")
 
-
-### Learning Pytorch with Examples
----
-
-
-### What is *torch.nn* really?
----
- 
-
-### Visualizing Models, Data, and Training with TensorBoard
----
-
-## Chapter 2 Image/Video
----
-
-
-   
-   2. 张量 Tensor
-     
-      + 获取张量大小, 返回值为元组, 支持元组操作
+      # Shape of tensor: torch.Size([3, 4])
+      # Datatype of tensor: torch.float32
+      # Device tensor is stored on: cpu
+      ```
+   + 获取张量大小, 返回值为元组, 支持元组操作
       ```python
       print(x.size())
       # torch.Size([5, 3]) 
       height, width = x.size()
       ```
-   3. Operation
-      + 加法
+   3. **张量的操作**
+      ```python
+      # We move our tensor to the GPU if available
+      if torch.cuda.is_available():
+         tensor = tensor.to('cuda')
+      ```
+   + 标准的索引与切片
+      ```python
+      tensor = torch.ones(4, 4)
+      tensor[:,1] = 0
+      print(tensor)
+
+      # tensor([[1., 0., 1., 1.],
+      #   [1., 0., 1., 1.],
+      #   [1., 0., 1., 1.],
+      #   [1., 0., 1., 1.]])
+      ```
+   + 张量的连接 *torch.cat, torch.stack*
+      ```python
+      t1 = torch.cat([tensor, tensor, tensor], dim=1)
+      print(t1)
+      
+      # tensor([[1., 0., 1., 1., 1., 0., 1., 1., 1., 0., 1., 1.],
+      #      [1., 0., 1., 1., 1., 0., 1., 1., 1., 0., 1., 1.],
+      #      [1., 0., 1., 1., 1., 0., 1., 1., 1., 0., 1., 1.],
+      #      [1., 0., 1., 1., 1., 0., 1., 1., 1., 0., 1., 1.]])
+      ```
+   + 乘法 
+      ```python
+      # This computes the element-wise product
+      print(f"tensor.mul(tensor) \n {tensor.mul(tensor)} \n")
+      # Alternative syntax:
+      print(f"tensor * tensor \n {tensor * tensor}")
+
+      # tensor.mul(tensor)
+      #  tensor([[1., 0., 1., 1.],
+      #         [1., 0., 1., 1.],
+      #         [1., 0., 1., 1.],
+      #         [1., 0., 1., 1.]])
+
+      # tensor * tensor
+      #  tensor([[1., 0., 1., 1.],
+      #         [1., 0., 1., 1.],
+      #         [1., 0., 1., 1.],
+      #         [1., 0., 1., 1.]])
+
+
+
+
+      # This computes the matrix multiplication between two tensors
+      print(f"tensor.matmul(tensor.T) \n {tensor.matmul(tensor.T)} \n")
+      # Alternative syntax:
+      print(f"tensor @ tensor.T \n {tensor @ tensor.T}")
+
+      # tensor.matmul(tensor.T)
+      # tensor([[3., 3., 3., 3.],
+      #       [3., 3., 3., 3.],
+      #       [3., 3., 3., 3.],
+      #       [3., 3., 3., 3.]])
+
+      # tensor @ tensor.T
+      # tensor([[3., 3., 3., 3.],
+      #       [3., 3., 3., 3.],
+      #       [3., 3., 3., 3.],
+      #       [3., 3., 3., 3.]])
+      ```
+   + In-place operations: Operations that have a _ suffix are in-place. For example: *x.copy_(y), x.t_(),* will change x.
+      ```python
+      print(tensor, "\n")
+      tensor.add_(5)
+      print(tensor)
+
+      # tensor([[1., 0., 1., 1.],
+      #       [1., 0., 1., 1.],
+      #       [1., 0., 1., 1.],
+      #       [1., 0., 1., 1.]])
+
+      # tensor([[6., 5., 6., 6.],
+      #       [6., 5., 6., 6.],
+      #       [6., 5., 6., 6.],
+      #       [6., 5., 6., 6.]])
+      ```
+   + 加法
       ```python
       y = torch.rand(5, 3)
       print(x+y)
@@ -151,12 +222,12 @@
       #         [ 0.3546, -0.1943, -1.1571],
       #         [-0.3531,  0.6117, -0.3783]])              
       ```
-      + 可以像Numpy一样对张量使用索引
+   + 可以像Numpy一样对张量使用索引
       ```python
       print(x[:, 1])
       # tensor([ 2.3056, -0.4332,  1.1492, -0.5270, -0.3139])
       ```
-      + 改变张量的size, 使用view(), size设置-1代表根据其他维度进行计算
+   + 改变张量的size, 使用view(), size设置-1代表根据其他维度进行计算
       ```python
       x = torch.rand(4, 4)
       y = x.view(16)
@@ -165,7 +236,7 @@
       
       # torch.Size([4, 4]) torch.Size([16]) torch.Size([2, 8])
       ```
-      + 只有一个元素的张量, 可以item()提取元素为数字
+   + 只有一个元素的张量, 可以item()提取元素为数字
       ```python
       x = torch.randn(1)
       print(x)
@@ -173,58 +244,56 @@
       # tensor([0.7324])
       # 0.7323789000511169
       ```
-      + 乘法 `torch.mm(input, mat2, out=None)`, `input.mm(mat2)`
-      + 张量范围限定 `torch.clamp(input, max, min, out=None)` input中的元素大于max的赋值为max, 小于min的赋值为min, 其他值保持不变
-      + 张量转置 `tensor.t()`
-      + [More Operations](https://pytorch.org/docs/stable/torch.html#)
-   4. 与Numpy转换
-      + Torch张量和NumPy数组将共享它们的底层内存位置(如果Torch张量在CPU上)，改变一个将改变另一个。
-      + 张量转换Numpy数组
+      
+   + 张量范围限定 `torch.clamp(input, max, min, out=None)` input中的元素大于max的赋值为max, 小于min的赋值为min, 其他值保持不变
+   + 张量转置 `tensor.t()`
+   + [More Operations](https://pytorch.org/docs/stable/torch.html#)
+   4. **与Numpy的联系**
+   + Torch张量和NumPy数组将共享它们的底层内存位置(如果Torch张量在CPU上)，改变一个将改变另一个。
+   + Tensors to Numpy
       ```python
-      a = torch.ones(5)
-      print(a)
-      
-      # tensor([1., 1., 1., 1., 1.])
-      
-      b = a.numpy()
-      print(b)
+      t = torch.ones(5)
+      print(f"t: {t}")
+      n = t.numpy()
+      print(f"n: {n}")
+
+      # t: tensor([1., 1., 1., 1., 1.])
+      # n: [1. 1. 1. 1. 1.]
+
+      # A change in the tensor reflects in the NumPy array.
+
+      t.add_(1)
+      print(f"t: {t}")
+      print(f"n: {n}")
+
+      # t: tensor([2., 2., 2., 2., 2.])
+      # n: [2. 2. 2. 2. 2.]
       ```
-      + Numpy和Torch共用一个内存
+   + Numpy to Tensors
       ```python
-      a.add_(1)
-      print(a)
-      print(b)
-      
-      # tensor([2., 2., 2., 2., 2.])
-      # [2. 2. 2. 2. 2.]
+      n = np.ones(5)
+      t = torch.from_numpy(n)
+      # Changes in the NumPy array reflects in the tensor.
+
+      np.add(n, 1, out=n)
+      print(f"t: {t}")
+      print(f"n: {n}")
+
+      # t: tensor([2., 2., 2., 2., 2.], dtype=torch.float64)
+      # n: [2. 2. 2. 2. 2.]
       ```
-      + Numpy数组转换张量
+   + `.to()`改变运行设备
       ```python
-      import numpy as np
-      
-      a = np.ones(5)
-      b = torch.from_numpy(a)
-      np.add(a, 1, out=a)
-      print(a)
-      print(b)
-      
-      # [2. 2. 2. 2. 2.]
-      # tensor([2., 2., 2., 2., 2.], dtype=torch.float64)
+      # let us run this cell only if CUDA is available
+      # We will use ``torch.device`` objects to move tensors in and out of GPU
+      if torch.cuda.is_available():
+         device = torch.device("cuda")         # a CUDA device object
+         y = torch.ones_like(x, device=device) # directly create a tensor on GPU
+         x = x.to(device)                      # or just use strings ``.to("cuda")``
+         z = x + y
+         print(z)
+         print(z.to("cpu", torch.double))      # ``.to`` can also change dtype together!
       ```
-      + 所有在CPU上的张量除char张量都支持来回转换成Numpy
-   5. `.to()`改变运行设备
-   ```python
-   # let us run this cell only if CUDA is available
-   # We will use ``torch.device`` objects to move tensors in and out of GPU
-   if torch.cuda.is_available():
-       device = torch.device("cuda")         # a CUDA device object
-       y = torch.ones_like(x, device=device) # directly create a tensor on GPU
-       x = x.to(device)                      # or just use strings ``.to("cuda")``
-       z = x + y
-       print(z)
-       print(z.to("cpu", torch.double))      # ``.to`` can also change dtype together!
-   ```
----
 ##### AutoGrad: 自动微分
 ---
    1. Tensor
@@ -632,6 +701,27 @@ $$
    net.to(device)
    inputs, labels = data[0].to(device), data[1].to(device)
    ```
+   
+      
+      
+
+
+
+### Learning Pytorch with Examples
+---
+
+
+### What is *torch.nn* really?
+---
+ 
+
+### Visualizing Models, Data, and Training with TensorBoard
+---
+
+## Chapter 2 Image/Video
+---
+
+---
 
 ----
 ### Chapter 2 Learning PyTorch With Examples
