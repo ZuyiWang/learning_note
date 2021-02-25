@@ -302,120 +302,137 @@
       + 也可以将代码放入`with torch.no_grad():`的block中, 也不会计算梯度
       + 每一个tensor有属性`.grad_fn`, 引用的创建该张量所涉及的函数
       + **如果张量是一个标量(也就是说，它只包含一个元素数据)，你不需要指定任何参数给`.backward()`，但是如果它有更多的元素，你需要指定一个梯度参数，一个匹配形状的张量**
-      ```python
-      import torch
-      x = torch.ones(2, 2, requires_grad=True)
-      print(x)
-      # tensor([[1., 1.],
-      #         [1., 1.]], requires_grad=True)
-      
-      y = x + 2
-      print(y)     # y was created as a result of an operation, so it has a grad_fn.
-      # tensor([[3., 3.],
-      #         [3., 3.]], grad_fn=<AddBackward0>)
-      
-      print(y.grad_fn)
-      # <AddBackward0 object at 0x7fcd66c306a0>
-      
-      z = y * y * 3
-      out = z.mean()
-      print(z, out)
-      # tensor([[27., 27.],
-      #         [27., 27.]], grad_fn=<MulBackward0>) 
-      # tensor(27., grad_fn=<MeanBackward0>)
-      ```
+         ```python
+         import torch
+         x = torch.ones(2, 2, requires_grad=True)
+         print(x)
+         # tensor([[1., 1.],
+         #         [1., 1.]], requires_grad=True)
+         
+         y = x + 2
+         print(y)     # y was created as a result of an operation, so it has a grad_fn.
+         # tensor([[3., 3.],
+         #         [3., 3.]], grad_fn=<AddBackward0>)
+         
+         print(y.grad_fn)
+         # <AddBackward0 object at 0x7fcd66c306a0>
+         
+         z = y * y * 3
+         out = z.mean()
+         print(z, out)
+         # tensor([[27., 27.],
+         #         [27., 27.]], grad_fn=<MulBackward0>) 
+         # tensor(27., grad_fn=<MeanBackward0>)
+         ```
       + **`.requires_grad_()`改变现有张量的requires_grad标志。如果没有给出输入标志，则默认为False**
-      ```python
-      a = torch.randn(2, 2)
-      a = (a*3) / (a-1)
-      print(a.requires_grad)
-      # False
-      
-      a.requires_grad_(True)
-      print(a.requires_grad)
-      # True
-      b = (a * a).sum()
-      print(b.grad_fn)
-      # <SumBackward0 object at 0x7fcd2ed8bb70>
-      ```
+         ```python
+         a = torch.randn(2, 2)
+         a = (a*3) / (a-1)
+         print(a.requires_grad)
+         # False
+         
+         a.requires_grad_(True)
+         print(a.requires_grad)
+         # True
+         b = (a * a).sum()
+         print(b.grad_fn)
+         # <SumBackward0 object at 0x7fcd2ed8bb70>
+         ```
    2. Gradient 梯度
       + `out`是一个标量, 所以`out.backward()`等价于`out.backward(torch.tensor(1.))`  
-      ```python
-      out.backward()
-      print(x.grad)
-      # tensor([[4.5000, 4.5000],
-      #         [4.5000, 4.5000]])
-      ```
+         ```python
+         out.backward()
+         print(x.grad)
+         # tensor([[4.5000, 4.5000],
+         #         [4.5000, 4.5000]])
+         ```
          + You should have got a matrix of `4.5`. Let’s call the `out` *Tensor*  $ o$. We have that $ o = \frac{1}{4}\sum_i z_i$,$z_i = 3(x_i+2)^2$ and $ z_i\bigr\rvert_{x_i=1} = 27$. Therefore, $ \frac{\partial o}{\partial x_i} = \frac{3}{2}(x_i+2)$, hence $ \frac{\partial o}{\partial x_i}\bigr\rvert_{x_i=1} = \frac{9}{2} = 4.5$.
       + 向量的情况
-      ```python
-      x = torch.randn(3, requires_grad=True)
+         ```python
+         x = torch.randn(3, requires_grad=True)
 
-      y = x * 2
-      while y.data.norm() < 1000:   # 计算y的2范数
-          y = y * 2
+         y = x * 2
+         while y.data.norm() < 1000:   # 计算y的2范数
+            y = y * 2
 
-      print(y)
-      # tensor([ 100.8142, 1115.5734,    7.2186], grad_fn=<MulBackward0>)
-      
-      v = torch.tensor([0.1, 1.0, 0.0001], dtype=torch.float)
-      y.backward(v)
+         print(y)
+         # tensor([ 100.8142, 1115.5734,    7.2186], grad_fn=<MulBackward0>)
+         
+         v = torch.tensor([0.1, 1.0, 0.0001], dtype=torch.float)
+         y.backward(v)
 
-      print(x.grad)
-      tensor([5.1200e+01, 5.1200e+02, 5.1200e-02])
-      ```
+         print(x.grad)
+         tensor([5.1200e+01, 5.1200e+02, 5.1200e-02])
+         ```
       + Mathematically, if you have a vector valued function $\vec{y}=f(\vec{x})$,then the gradient of $\vec{y}$ with respect to $\vec{x}$ is a Jacobian matrix:
 
-$$
-\begin{align}J=\left(\begin{array}{ccc}
-   \frac{\partial y_{1}}{\partial x_{1}} & \cdots & \frac{\partial y_{1}}{\partial x_{n}}\\
-   \vdots & \ddots & \vdots\\
-   \frac{\partial y_{m}}{\partial x_{1}} & \cdots & \frac{\partial y_{m}}{\partial x_{n}}
-   \end{array}\right)\end{align}
-$$
+         $$
+         J
+            =
+               \left(\begin{array}{cc}
+               \frac{\partial \bf{y}}{\partial x_{1}} &
+               ... &
+               \frac{\partial \bf{y}}{\partial x_{n}}
+               \end{array}\right)
+            =
+            \left(\begin{array}{ccc}
+               \frac{\partial y_{1}}{\partial x_{1}} & \cdots & \frac{\partial y_{1}}{\partial x_{n}}\\
+               \vdots & \ddots & \vdots\\
+               \frac{\partial y_{m}}{\partial x_{1}} & \cdots & \frac{\partial y_{m}}{\partial x_{n}}
+               \end{array}\right)
+         $$
 
-​             Generally speaking, ``torch.autograd`` is an engine for computing vector-Jacobian product. That is, given any vector $v=\left(\begin{array}{cccc} v_{1} & v_{2} & \cdots & v_{m}\end{array}\right)^{T}$, compute the product $v^{T}\cdot J$. If $v$ happens to be the gradient of a scalar function $l=g\left(\vec{y}\right)$, that is, $v=\left(\begin{array}{ccc}\frac{\partial l}{\partial y_{1}} & \cdots & \frac{\partial l}{\partial y_{m}}\end{array}\right)^{T}$, then by the chain rule, the vector-Jacobian product would be the
-gradient of $l$ with respect to $\vec{x}$:
-$$
-\begin{align}J^{T}\cdot v=\left(\begin{array}{ccc}
-   \frac{\partial y_{1}}{\partial x_{1}} & \cdots & \frac{\partial y_{m}}{\partial x_{1}}\\
-   \vdots & \ddots & \vdots\\
-   \frac{\partial y_{1}}{\partial x_{n}} & \cdots & \frac{\partial y_{m}}{\partial x_{n}}
-   \end{array}\right)\left(\begin{array}{c}
-   \frac{\partial l}{\partial y_{1}}\\
-   \vdots\\
-   \frac{\partial l}{\partial y_{m}}
-   \end{array}\right)=\left(\begin{array}{c}
-   \frac{\partial l}{\partial x_{1}}\\
-   \vdots\\
-   \frac{\partial l}{\partial x_{n}}
-   \end{array}\right)\end{align}
-$$
-(Note that $v^{T}\cdot J$ gives a row vector which can be treated as a column vector by taking $J^{T}\cdot v$.) This characteristic of vector-Jacobian product makes it very convenient to feed external gradients into a model that has non-scalar output.
+         ​Generally speaking, ``torch.autograd`` is an engine for computing vector-Jacobian product. That is, given any vector $v=\left(\begin{array}{cccc} v_{1} & v_{2} & \cdots & v_{m}\end{array}\right)^{T}$, compute the product $v^{T}\cdot J$. If $v$ happens to be the gradient of a scalar function $l=g\left(\vec{y}\right)$, that is, $v=\left(\begin{array}{ccc}\frac{\partial l}{\partial y_{1}} & \cdots & \frac{\partial l}{\partial y_{m}}\end{array}\right)^{T}$, then by the chain rule, the vector-Jacobian product would be the
+         gradient of $l$ with respect to $\vec{x}$:
+         $$
+         J^{T}\cdot v=\left(\begin{array}{ccc}
+            \frac{\partial y_{1}}{\partial x_{1}} & \cdots & \frac{\partial y_{m}}{\partial x_{1}}\\
+            \vdots & \ddots & \vdots\\
+            \frac{\partial y_{1}}{\partial x_{n}} & \cdots & \frac{\partial y_{m}}{\partial x_{n}}
+            \end{array}\right)\left(\begin{array}{c}
+            \frac{\partial l}{\partial y_{1}}\\
+            \vdots\\
+            \frac{\partial l}{\partial y_{m}}
+            \end{array}\right)=\left(\begin{array}{c}
+            \frac{\partial l}{\partial x_{1}}\\
+            \vdots\\
+            \frac{\partial l}{\partial x_{n}}
+            \end{array}\right)
+         $$
+         (Note that $v^{T}\cdot J$ gives a row vector which can be treated as a column vector by taking $J^{T}\cdot v$.) This characteristic of vector-Jacobian product makes it very convenient to feed external gradients into a model that has non-scalar output.
       
 
-```python
-  print(x.requires_grad)
-  # True
-  print((x ** 2).requires_grad)
-  # True
+            ```python
+            print(x.requires_grad)
+            # True
+            print((x ** 2).requires_grad)
+            # True
 
-  with torch.no_grad():
-     print((x ** 2).requires_grad)
-  # False
-  
-  y = x.detach()
-  print(y.requires_grad)
-  # False
-  print(x.eq(y).all())
-  # tensor(True)
-```
+            with torch.no_grad():
+               print((x ** 2).requires_grad)
+            # False
+            
+            y = x.detach()
+            print(y.requires_grad)
+            # False
+            print(x.eq(y).all())
+            # tensor(True)
+            ```
+      + 计算图： DAGs are dynamic in PyTorch An important thing to note is that the graph is recreated from scratch; after each .backward() call, autograd starts populating a new graph. This is exactly what allows you to use control flow statements in your model; you can change the shape, size and operations at every iteration if needed.
 
-+ [More autograd.Function](https://pytorch.org/docs/stable/autograd.html#function)
+      + [More autograd.Function](https://pytorch.org/docs/stable/autograd.html#function)
 ----
 ##### Neural Networks
 ----
    + 神经网络可以使用`torch.nn`包来构建
+   + A typical training procedure for a neural network is as follows:
+
+      1. Define the neural network that has some learnable parameters (or weights)
+      2. Iterate over a dataset of inputs
+      3. Process input through the network
+      4. Compute the loss (how far is the output from being correct)
+      4. Propagate gradients back into the network’s parameters
+      5. Update the weights of the network, typically using a simple update rule: **weight = weight - learning_rate * gradient**
    1. 网络结构定义
    ```python
    # 一个简单CNN的定义 
@@ -530,7 +547,7 @@ $$
       # conv1.bias.grad after backward
       # tensor([-0.0022, -0.0174, -0.0071, -0.0145,  0.0047,  0.0032])
       ```
-   + [More lossFunction](https://pytorch.org/docs/nn)
+   + [More lossfunction](https://pytorch.org/docs/nn)
    8. 更新参数
       + 随机梯度下降
       ```python
