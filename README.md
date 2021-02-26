@@ -19,6 +19,7 @@
 2. git 
 3. LaTeX
 4. markdown
+5. OpenCV (中文手册)
 ## Mathematics
 1. Linear Algebra
 电子书 "Introduction to Linear Algebra", Gilbert Strang
