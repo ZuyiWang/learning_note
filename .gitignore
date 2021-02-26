@@ -7,3 +7,6 @@
 /learn_python/
 /learn_pytorch/
 /ros/
+/TensorBoard/data
+/TensorBoard/runs
+/TensorBoard/__pycache__
